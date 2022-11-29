@@ -5,11 +5,10 @@ import com.bianchini.jbcatalog.entities.Category;
 import com.bianchini.jbcatalog.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,5 +28,25 @@ public class CategoryResources {
     public ResponseEntity<CategoryDto> findById(@PathVariable Long id){
         CategoryDto dto = categoryService.findById(id);
         return ResponseEntity.ok().body(dto);
+    }
+
+    @PostMapping
+    public ResponseEntity<CategoryDto> saveCategory(@RequestBody CategoryDto categoryDto){
+        CategoryDto dto = categoryService.saveCategory(categoryDto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(categoryDto.getId()).toUri();
+        return ResponseEntity.created(uri).body(dto);
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto){
+        CategoryDto dto = categoryService.updateCategory(id, categoryDto);
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id){
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

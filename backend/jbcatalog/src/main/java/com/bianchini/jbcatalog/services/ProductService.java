@@ -25,6 +25,9 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Transactional(readOnly = true)
     public Page<ProductDto> findAllPaged(PageRequest pageRequest){
         Page<Product> list = productRepository.findAll(pageRequest);
@@ -41,7 +44,7 @@ public class ProductService {
     @Transactional
     public ProductDto saveProduct(ProductDto productDto) {
         Product product = new Product();
-        //product.setName(productDto.getName());
+        copyDtoToEntity(productDto, product);
         product = productRepository.save(product);
         return new ProductDto(product);
     }
@@ -50,7 +53,7 @@ public class ProductService {
     public ProductDto updateProduct(Long id, ProductDto productDto) {
         try {
             Product product = productRepository.getReferenceById(id);
-            //product.setName(productDto.getName());
+            copyDtoToEntity(productDto, product);
             product = productRepository.save(product);
             return new ProductDto(product);
         } catch (EntityNotFoundException e){
@@ -67,6 +70,21 @@ public class ProductService {
         }
         catch (DataIntegrityViolationException e){
             throw new DataBaseException("Integration violation");
+        }
+    }
+
+    private void copyDtoToEntity(ProductDto productDto, Product product) {
+
+        product.setName(productDto.getName());
+        product.setDescription(productDto.getDescription());
+        product.setDate(productDto.getDate());
+        product.setPrice(productDto.getPrice());
+        product.setImageUrl(productDto.getImageUrl());
+
+        product.getCategories().clear();
+        for (CategoryDto catDto: productDto.getCategories()){
+            Category category = categoryRepository.getReferenceById(catDto.getId());
+            product.getCategories().add(category);
         }
     }
 }

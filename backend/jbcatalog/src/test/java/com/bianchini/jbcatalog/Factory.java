@@ -18,4 +18,9 @@ public class Factory {
         Product product = create();
         return new ProductDto(product, product.getCategories());
     }
+
+    public static Category creteCategory(){
+        Category category = new Category(1L, "Books");
+        return category;
+    }
 }

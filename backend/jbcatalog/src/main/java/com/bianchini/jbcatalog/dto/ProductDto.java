@@ -3,6 +3,9 @@ package com.bianchini.jbcatalog.dto;
 import com.bianchini.jbcatalog.entities.Category;
 import com.bianchini.jbcatalog.entities.Product;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,8 +15,13 @@ import java.util.Set;
 public class ProductDto implements Serializable {
 
     private Long id;
+
+    @NotBlank(message = "Campo obrigatório")
+    @Size(min = 5, max = 60, message = "Campo deve ter entre 5 e 60 caracteres")
     private String name;
     private String description;
+
+    @Positive(message = "Apenas valores positivo")
     private Double price;
     private String imageUrl;
     private Instant date;

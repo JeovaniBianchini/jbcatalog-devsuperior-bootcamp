@@ -2,6 +2,8 @@ package com.bianchini.jbcatalog.dto;
 
 import com.bianchini.jbcatalog.entities.User;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,8 +11,12 @@ import java.util.Set;
 public class UserDto implements Serializable {
 
     private Long id;
+
+    @NotBlank(message = "Campo obrigatório")
     private String firstName;
     private String lastName;
+
+    @Email
     private String email;
 
     private Set<RoleDto> roles = new HashSet<>();

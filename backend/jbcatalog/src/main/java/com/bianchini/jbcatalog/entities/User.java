@@ -22,7 +22,7 @@ public class User implements Serializable {
     private String email;
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)  //(fetch = FetchType.EAGER) Quando buscar um usuario no banco, irá forçar a trazer os perfis(roles).
     @JoinTable(name = "tb_user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

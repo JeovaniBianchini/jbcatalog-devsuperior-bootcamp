@@ -1,7 +1,8 @@
 package com.bianchini.jbcatalog.entities;
 
-import jakarta.persistence.*;
 
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;

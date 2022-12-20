@@ -2,7 +2,7 @@ package com.bianchini.jbcatalog.resources.exceptions;
 
 import java.io.Serializable;
 
-public class FieldMessage implements Serializable {
+public class FieldMessage implements Serializable {  //Classe que auxilida na mensagem de erro personalizada
 
     private String fieldName;
     private String message;

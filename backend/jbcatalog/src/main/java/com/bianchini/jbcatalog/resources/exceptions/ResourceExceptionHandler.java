@@ -49,7 +49,7 @@ public class ResourceExceptionHandler {
         err.setMessage(e.getMessage());
         err.setPath(request.getRequestURI());
 
-        for (FieldError f : e.getBindingResult().getFieldErrors()){
+        for (FieldError f : e.getBindingResult().getFieldErrors()){  //um loop para adicionar cada mensagem de erro na resposta http.
             err.addError(f.getField(), f.getDefaultMessage());
         }
         return ResponseEntity.status(status).body(err);

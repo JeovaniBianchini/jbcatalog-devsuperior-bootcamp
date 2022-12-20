@@ -1,9 +1,6 @@
 package com.bianchini.jbcatalog.services;
 
-import com.bianchini.jbcatalog.dto.ProductDto;
-import com.bianchini.jbcatalog.dto.RoleDto;
-import com.bianchini.jbcatalog.dto.UserDto;
-import com.bianchini.jbcatalog.dto.UserInsertDto;
+import com.bianchini.jbcatalog.dto.*;
 import com.bianchini.jbcatalog.entities.Product;
 import com.bianchini.jbcatalog.entities.Role;
 import com.bianchini.jbcatalog.entities.User;
@@ -58,7 +55,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUser(Long id, UserDto userDto) {
+    public UserDto updateUser(Long id, UserUpdateDto userDto) {
         try {
             User user = userRepository.getReferenceById(id);
             copyDtoToEntity(userDto, user);

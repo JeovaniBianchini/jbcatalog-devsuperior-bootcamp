@@ -12,7 +12,7 @@ import com.bianchini.jbcatalog.entities.User;
 import com.bianchini.jbcatalog.repositories.UserRepository;
 import com.bianchini.jbcatalog.resources.exceptions.FieldMessage;
 
-public class UserInsertValidator implements ConstraintValidator<UserInsertValid, UserInsertDto> {
+public class UserInsertValidator implements ConstraintValidator<UserInsertValid, UserInsertDto> {  //Classe que faz uma validação para não inserir um usuário com email ja existente no banco de dados
 
     @Autowired
     private UserRepository userRepository;

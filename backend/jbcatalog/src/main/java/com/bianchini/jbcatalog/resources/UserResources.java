@@ -3,6 +3,7 @@ package com.bianchini.jbcatalog.resources;
 import com.bianchini.jbcatalog.dto.ProductDto;
 import com.bianchini.jbcatalog.dto.UserDto;
 import com.bianchini.jbcatalog.dto.UserInsertDto;
+import com.bianchini.jbcatalog.dto.UserUpdateDto;
 import com.bianchini.jbcatalog.services.ProductService;
 import com.bianchini.jbcatalog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class UserResources {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDto> updateUser(@Valid @PathVariable Long id, @RequestBody UserDto userDto){
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userDto){
         UserDto dto = userService.updateUser(id, userDto);
         return ResponseEntity.ok().body(dto);
     }

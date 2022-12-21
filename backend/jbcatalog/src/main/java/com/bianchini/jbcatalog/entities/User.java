@@ -2,15 +2,21 @@ package com.bianchini.jbcatalog.entities;
 
 
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_user")
-public class User implements Serializable {
+public class User implements UserDetails, Serializable {  //UserDetails é uma interface que retorna detalhes do usuario.
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -95,4 +101,36 @@ public class User implements Serializable {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {  //Método que retorna os perfis do usuario.
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getAuthority())).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {  //Método do UserDetails que retorna o usuario.
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {  //Método do UserDetails deixando padrão
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {  //Método do UserDetails deixando padrão
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {  //Método do UserDetails deixando padrão
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {  //Método do UserDetails deixando padrão
+        return true;
+    }
+
+
 }

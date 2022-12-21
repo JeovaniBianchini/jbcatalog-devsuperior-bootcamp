@@ -8,11 +8,16 @@ import com.bianchini.jbcatalog.repositories.RoleRepository;
 import com.bianchini.jbcatalog.repositories.UserRepository;
 import com.bianchini.jbcatalog.services.exceptions.DataBaseException;
 import com.bianchini.jbcatalog.services.exceptions.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +26,9 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {  //UserDetailsService é uma interface que contém o método para buscar o usuario no banco de dados
+
+    private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -89,5 +96,16 @@ public class UserService {
             Role role = roleRepository.getReferenceById(roleDto.getId());
             user.getRoles().add(role);
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {  //Método que busca o usuario.
+        User user = userRepository.findByEmail(username);
+        if (user == null){
+            logger.error("User not found: " + username);
+            throw new UsernameNotFoundException("Email not found");
+        }
+        logger.info("User found: " + username);
+        return user;
     }
 }

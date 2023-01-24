@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 //Classe de configuração para o servidor de autorização/autenticação.

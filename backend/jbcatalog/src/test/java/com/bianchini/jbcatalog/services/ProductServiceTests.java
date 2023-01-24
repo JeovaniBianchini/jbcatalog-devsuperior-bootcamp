@@ -8,7 +8,6 @@ import com.bianchini.jbcatalog.repositories.CategoryRepository;
 import com.bianchini.jbcatalog.repositories.ProductRepository;
 import com.bianchini.jbcatalog.services.exceptions.DataBaseException;
 import com.bianchini.jbcatalog.services.exceptions.ResourceNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 

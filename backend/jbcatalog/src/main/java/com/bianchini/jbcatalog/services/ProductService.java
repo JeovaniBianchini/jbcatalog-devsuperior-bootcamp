@@ -30,9 +30,9 @@ public class ProductService {
     private CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ProductDto> findAllPaged(Long categoryId, Pageable pageable){
+    public Page<ProductDto> findAllPaged(Long categoryId, String name, Pageable pageable){
         Category category = (categoryId == 0) ? null : categoryRepository.getReferenceById(categoryId); //Operador ternário: condição proporcional ao (if else).
-        Page<Product> list = productRepository.findProducts(category, pageable);
+        Page<Product> list = productRepository.findProducts(category, name, pageable);
         return list.map(x -> new ProductDto(x));
     }
 

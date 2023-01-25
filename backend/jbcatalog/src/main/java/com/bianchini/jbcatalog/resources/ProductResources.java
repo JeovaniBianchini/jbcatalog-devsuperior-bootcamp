@@ -24,8 +24,11 @@ public class ProductResources {
     private ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Page<ProductDto>> findAll(@RequestParam(value = "categoryId", defaultValue = "0")Long categoryId, Pageable pageable){
-        Page<ProductDto> list = productService.findAllPaged(categoryId, pageable);
+    public ResponseEntity<Page<ProductDto>> findAll(
+            @RequestParam(value = "categoryId", defaultValue = "0")Long categoryId,
+            @RequestParam(value = "name", defaultValue = "")String name,
+            Pageable pageable){
+        Page<ProductDto> list = productService.findAllPaged(categoryId, name.trim(), pageable);   //Trim() é a função que elimina na busca os campos vazios.
         return ResponseEntity.ok().body(list);
     }
 

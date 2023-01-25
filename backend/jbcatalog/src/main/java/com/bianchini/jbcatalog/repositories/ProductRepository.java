@@ -22,8 +22,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     p.categorias cs =====> Através da tabela Product pode acessar as categorias, foi apelidado como "cs" .
     WHERE =====> Condição onde determina limites para a buscar.
     (:category IS NULL OR :category IN cs) =====> O category é a variavel que vem dos parametros do método. "IS NULL OR" é uma condição para uma coisa ou outra e "IN" define que pode estar dentro das lista de categorias.
+    AND =====> Junção das condições.
+    LOWER =====> Função que converte tudo para letras minusculas.
+    p.name =====> Produto está acessando o atributo nome.
+    LIKE =====> Recurso que determina se algum valor contém na busca.
+    CONCAT =====> Função que junta os valores, no caso aqui, qualquer coisa antes(%) ou depois(%) do valor(:name).
 
      */
-    @Query("SELECT DISTINCT p FROM Product p INNER JOIN p.categories cs WHERE (:category IS NULL OR :category IN cs)")
-    Page<Product> findProducts(Category category, Pageable pageable);
+    @Query("SELECT DISTINCT p FROM Product p INNER JOIN p.categories cs WHERE " +
+            "(:category IS NULL OR :category IN cs) AND " +
+            "(LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) )")
+    Page<Product> findProducts(Category category, String name, Pageable pageable);
 }

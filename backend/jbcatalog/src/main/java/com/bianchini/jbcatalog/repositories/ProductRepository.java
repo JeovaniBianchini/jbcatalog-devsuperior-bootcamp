@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -27,10 +29,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     p.name =====> Produto está acessando o atributo nome.
     LIKE =====> Recurso que determina se algum valor contém na busca.
     CONCAT =====> Função que junta os valores, no caso aqui, qualquer coisa antes(%) ou depois(%) do valor(:name).
+    COALESCE =====> Função que faz um tratamento para valores nulos.
 
      */
     @Query("SELECT DISTINCT p FROM Product p INNER JOIN p.categories cs WHERE " +
-            "(:category IS NULL OR :category IN cs) AND " +
+            "(COALESCE(:categories) IS NULL OR cs IN :categories) AND " +
             "(LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) )")
-    Page<Product> findProducts(Category category, String name, Pageable pageable);
+    Page<Product> findProducts(List<Category> categories, String name, Pageable pageable);  //Método aceita uma lista categorias.
+
+    @Query("SELECT p FROM Product p JOIN FETCH p.categories WHERE p IN :products")
+    List<Product> findProductsWithCategories(List<Product> products);
 }

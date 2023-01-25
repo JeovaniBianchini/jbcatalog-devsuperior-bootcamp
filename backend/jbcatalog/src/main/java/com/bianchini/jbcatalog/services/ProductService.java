@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,9 +33,10 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductDto> findAllPaged(Long categoryId, String name, Pageable pageable){
-        Category category = (categoryId == 0) ? null : categoryRepository.getReferenceById(categoryId); //Operador ternário: condição proporcional ao (if else).
-        Page<Product> list = productRepository.findProducts(category, name, pageable);
-        return list.map(x -> new ProductDto(x));
+        List<Category> categories = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getOne(categoryId)); //Operador ternário: condição proporcional ao (if else). Se categoryId for = 0 retornar nulo ou retornar uma lista usando Arrays.asList passando o valor de getReferenceById.
+        Page<Product> list = productRepository.findProducts(categories, name, pageable);
+        productRepository.findProductsWithCategories(list.getContent());
+        return list.map(x -> new ProductDto(x, x.getCategories()));
     }
 
     @Transactional(readOnly = true)
@@ -54,7 +57,7 @@ public class ProductService {
     @Transactional
     public ProductDto updateProduct(Long id, ProductDto productDto) {
         try {
-            Product product = productRepository.getReferenceById(id);
+            Product product = productRepository.getOne(id);
             copyDtoToEntity(productDto, product);
             product = productRepository.save(product);
             return new ProductDto(product);
@@ -85,7 +88,7 @@ public class ProductService {
 
         product.getCategories().clear();
         for (CategoryDto catDto: productDto.getCategories()){
-            Category category = categoryRepository.getReferenceById(catDto.getId());
+            Category category = categoryRepository.getOne(catDto.getId());
             product.getCategories().add(category);
         }
     }

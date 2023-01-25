@@ -64,7 +64,7 @@ public class UserService implements UserDetailsService {  //UserDetailsService Ã
     @Transactional
     public UserDto updateUser(Long id, UserUpdateDto userDto) {
         try {
-            User user = userRepository.getReferenceById(id);
+            User user = userRepository.getOne(id);
             copyDtoToEntity(userDto, user);
             user = userRepository.save(user);
             return new UserDto(user);
@@ -93,7 +93,7 @@ public class UserService implements UserDetailsService {  //UserDetailsService Ã
 
         user.getRoles().clear();
         for (RoleDto roleDto : userDto.getRoles()) {
-            Role role = roleRepository.getReferenceById(roleDto.getId());
+            Role role = roleRepository.getOne(roleDto.getId());
             user.getRoles().add(role);
         }
     }

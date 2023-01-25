@@ -1,6 +1,7 @@
 package com.bianchini.jbcatalog.resources;
 
 import com.bianchini.jbcatalog.Factory;
+import com.bianchini.jbcatalog.TokenUtil;
 import com.bianchini.jbcatalog.dto.ProductDto;
 import com.bianchini.jbcatalog.services.ProductService;
 import com.bianchini.jbcatalog.services.exceptions.DataBaseException;
@@ -12,7 +13,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
@@ -22,8 +25,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-@WebMvcTest(ProductResources.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class ProductResourceTests {
+
+    @Autowired
+    private TokenUtil tokenUtil;
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,6 +45,9 @@ public class ProductResourceTests {
     private Long nonExistsId;
     private Long dependentId;
 
+    private String name;
+    private String password;
+
     private ProductDto productDto;
     private PageImpl<ProductDto> page;
 
@@ -47,10 +57,13 @@ public class ProductResourceTests {
         nonExistsId = 2L;
         dependentId = 3L;
 
+        name = "maria@gmail.com";
+        password = "123456";
+
         productDto = Factory.createDto();
         page = new PageImpl<>(List.of(productDto));
 
-        Mockito.when(productService.findAllPaged(ArgumentMatchers.any())).thenReturn(page);
+        Mockito.when(productService.findAllPaged(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(page);
 
         Mockito.when(productService.findById(existsId)).thenReturn(productDto);
         Mockito.when(productService.findById(nonExistsId)).thenThrow(ResourceNotFoundException.class);
@@ -94,63 +107,81 @@ public class ProductResourceTests {
 
     @Test
     public void updateShouldReturnProductDtoIdExists() throws Exception{
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
         String jsonBody = objectMapper.writeValueAsString(productDto);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}", existsId)
-                .content(jsonBody)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists());
+                        .header("Authorization", "Bearer " + accessToken)
+                        .content(jsonBody)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isOk())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.name").exists())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists());
 
     }
 
     @Test
     public void updateShouldReturnNotFoundIdDoesNotExists() throws Exception{
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
         String jsonBody = objectMapper.writeValueAsString(productDto);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}", nonExistsId)
+                        .header("Authorization", "Bearer " + accessToken)
                         .content(jsonBody)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                        .andExpect(MockMvcResultMatchers.status().isNotFound());
 
     }
 
     @Test
     public void deleteShouldDoNothingWhenIdExists() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", existsId)
+                        .header("Authorization", "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                        .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
     public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() throws Exception {
 
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
         mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", nonExistsId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                        .header("Authorization", "Bearer " + accessToken)
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void deleteShouldThrowDataBaseExceptionWhenIdDependent() throws Exception {
 
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
         mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", dependentId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                        .header("Authorization", "Bearer " + accessToken)
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     public void saveShouldInsertProduct() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
         String jsonBody = objectMapper.writeValueAsString(productDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/products")
-                .content(jsonBody)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+                        .header("Authorization", "Bearer " + accessToken)
+                        .content(jsonBody)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 }

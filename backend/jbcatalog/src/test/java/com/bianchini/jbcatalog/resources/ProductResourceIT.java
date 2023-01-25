@@ -1,6 +1,7 @@
 package com.bianchini.jbcatalog.resources;
 
 import com.bianchini.jbcatalog.Factory;
+import com.bianchini.jbcatalog.TokenUtil;
 import com.bianchini.jbcatalog.dto.ProductDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductResourceIT {
 
     @Autowired
+    private TokenUtil tokenUtil;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -29,6 +33,8 @@ public class ProductResourceIT {
     private Long nonExistsId;
     private Long countTotalProducts;
     private ProductDto productDto;
+    private String name;
+    private String password;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -36,6 +42,8 @@ public class ProductResourceIT {
         nonExistsId = 1000L;
         countTotalProducts = 25L;
         productDto = Factory.createDto();
+        name = "maria@gmail.com";
+        password = "123456";
     }
 
     @Test
@@ -53,6 +61,8 @@ public class ProductResourceIT {
 
     @Test
     public void updateShouldReturnProductDtoWhenIdExists() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
         String jsonBody = objectMapper.writeValueAsString(productDto);
 
         String expetedName = productDto.getName();
@@ -60,6 +70,7 @@ public class ProductResourceIT {
 
 
         mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}", existId)
+                        .header("Authorization", "Bearer " + accessToken)
                         .content(jsonBody)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -72,9 +83,12 @@ public class ProductResourceIT {
 
     @Test
     public void updateShouldReturnNotFoundWhenIdDoesNotExists() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, name, password);
+
         String jsonBody = objectMapper.writeValueAsString(productDto);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}", nonExistsId)
+                        .header("Authorization", "Bearer " + accessToken)
                         .content(jsonBody)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))

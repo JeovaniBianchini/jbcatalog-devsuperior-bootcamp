@@ -60,8 +60,10 @@ public class ProductServiceTests {
 
         Mockito.when(productRepository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
 
-        Mockito.when(productRepository.getReferenceById(existingId)).thenReturn(product);
-        Mockito.when(productRepository.getReferenceById(nonExistingId)).thenThrow(EntityNotFoundException.class);
+        Mockito.when(productRepository.findProducts(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(page);
+
+        Mockito.when(productRepository.getOne(existingId)).thenReturn(product);
+        Mockito.when(productRepository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
 
         Mockito.when(productRepository.save(ArgumentMatchers.any())).thenReturn(product);
 
@@ -72,8 +74,8 @@ public class ProductServiceTests {
         Mockito.doThrow(EmptyResultDataAccessException.class).when(productRepository).deleteById(nonExistingId);
         Mockito.doThrow(DataIntegrityViolationException.class).when(productRepository).deleteById(dependentId);
 
-        Mockito.when(categoryRepository.getReferenceById(existingId)).thenReturn(category);
-        Mockito.when(categoryRepository.getReferenceById(nonExistingId)).thenThrow(EntityNotFoundException.class);
+        Mockito.when(categoryRepository.getOne(existingId)).thenReturn(category);
+        Mockito.when(categoryRepository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
     }
 
     @Test
@@ -115,10 +117,9 @@ public class ProductServiceTests {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<ProductDto> result = service.findAllPaged(pageable);
+        Page<ProductDto> result = service.findAllPaged(0L, "", pageable);
 
         Assertions.assertNotNull(result);
-        Mockito.verify(productRepository).findAll(pageable);
     }
 
     @Test
